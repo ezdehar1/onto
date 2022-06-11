@@ -76,10 +76,10 @@ def main(args):
     # Set the seed for randomization
     set_seed(args.seed)
 
-    # Get the datasets and vocab for tags and tokens
-    datasets, vocab = parse_conll_files((args.train_path, args.val_path, args.test_path))
+    # Get the datasets and vocab for tags and tokens 
+    datasets, vocab = parse_conll_files((args.train_path, args.val_path, args.test_path)) # read from files return indexes for tagvocab
 
-    # From the datasets generate the dataloaders
+    # From the datasets generate the dataloaders --- give dataloader 8 sent every time, each time convert sent to subwordid  and label to index
     datasets = [
         DefaultDataset(
             examples=dataset, vocab=vocab, bert_model=args.bert_model
@@ -96,7 +96,7 @@ def main(args):
         collate_fn=dataset.collate_fn,
     ) for i, dataset in enumerate(datasets)]
 
-    # Initialize the model
+    # Initialize the model  ------dropout for regulization weight zero to 10% of neurans
     model = BertTagger(
         bert_model=args.bert_model, num_labels=len(vocab.tags), dropout=0.1
     )
@@ -114,7 +114,7 @@ def main(args):
     # Initialize the loss function
     loss = torch.nn.CrossEntropyLoss()
 
-    # Initialize the trainer
+    # Initialize the trainer ------ take all the past and gedin train
     trainer = BertTrainer(
         model=model,
         optimizer=optimizer,
